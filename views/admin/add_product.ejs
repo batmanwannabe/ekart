@@ -1,0 +1,44 @@
+<%- include('../_layout/adminheader') %>
+
+<h2 class="page-title">Add a product</h2>
+<a href="/admin/products" class="btn btn-primary">Back to all products</a>
+<br><br>
+
+
+<form action="/admin/products/add-product" method="post" enctype="multipart/form-data">
+  <div class="form-group">
+		<label for="">Title</label>
+		<input type="text" class="form-control" name="title" value="<%= title %>" placeholder="Title" />
+	</div>
+
+	<div class="form-group">
+		<label for="">Description</label>
+		<textarea name="desc" class="form-control" cols="30" rows="10" placeholder="desc"><%= desc %></textarea>
+	</div>
+
+	<div class="form-group">
+		<label for="">Category</label>
+		<select name="category" class="form-control">
+			<% categories.forEach(function(cat){ %>
+				<option value="<%= cat.key %>"><%= cat.title %></option>
+			<% }); %>
+		</select>
+	</div>
+
+	<div class="form-group">
+		<label for="">Price</label>
+		<input type="text" class="form-control" name="price" value="<%= price %>" placeholder="Price" />
+	</div>
+
+	<div class="form-group">
+		<label for="">Image</label>
+		<input type="file" name="image" id="img" class="form-control" />
+		<img src="#" id="imgPreview" alt="" />
+	</div>
+
+	<button class="btn btn-default">Submit</button>
+</form>
+<script>
+    </script>
+
+<%- include('../_layout/adminfooter') %>
