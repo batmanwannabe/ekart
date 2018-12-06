@@ -8,60 +8,65 @@ var Product = require('../models/products');
 
 var Category = require('../models/category');
 
-//get all products
-router.get('/', function (req, res) {
-    Product.find(function (err, products) {
+/*
+ * GET add product to cart
+ */
+router.get('/add/:product', function (req, res) {
+
+    var key = req.params.product;
+
+    Product.findOne({key: key}, function (err, p) {
         if (err)
             console.log(err);
-        res.render('all_products', {
-            title: 'All Products',
-            products: products
-        });
-    });
-});
 
-
-//get all products by category
-router.get('/:category', function (req, res) {
-    var categoryKey = req.params.category;
-    Category.findOne({key: categoryKey}, function (err, category) {
-
-
-        Product.find({category: categoryKey}, function (err, products) {
-            if (err)
-                console.log(err);
-            res.render('cat_products', {
-                title: category.title,
-                products: products
+        if (typeof req.session.cart == "undefined") {
+            req.session.cart = [];
+            req.session.cart.push({
+                title: key,
+                qty: 1,
+                price: parseFloat(p.price).toFixed(2),
+                image: '/product_images/' + p._id + '/' + p.image
             });
-        });
+        } else {
+            var cart = req.session.cart;
+            var newItem = true;
+
+            for (var i = 0; i < cart.length; i++) {
+                if (cart[i].title == key) {
+                    cart[i].qty++;
+                    newItem = false;
+                    break;
+                }
+            }
+
+            if (newItem) {
+                cart.push({
+                    title: key,
+                    qty: 1,
+                    price: parseFloat(p.price).toFixed(2),
+                    image: '/product_images/' + p._id + '/' + p.image
+                });
+            }
+        }
+
+        console.log(req.session.cart);
+        req.flash('success', 'Product added!');
+        res.redirect('back');
     });
+
 });
 
-//get all products by category
-router.get('/:category/:product', function (req, res) {
-    var galleryImages = null;
+/*
+ * GET checkout page
+ */
+router.get('/checkout', function (req, res) {
+
+    res.render('checkout', {
+            title: 'Checkout',
+            cart: req.session.cart
+        });
     
-    Product.findOne({key:req.params.product}, function(err,product){
-        if(err){
-            console.log(err);
-        }else {
-            var galleryDir = 'public/product_images/'+product._id+'/gallery';
-            fs.readdir(galleryDir, function(err,files){
-                if(err){
-                    console.log(err);
-                }else{
-                    galleryImages = files;
-                    res.render('product',{
-                        title:product.title,
-                        p:product,
-                        galleryImages: galleryImages
-                    })
-                }
-            })
-            
-        }
-    })
+
 });
 
 
